@@ -410,16 +410,19 @@ When NOSEEK is not nil then dont try to seek but open directly."
   "Build mpv link with timestamp that used in org buffer.
 PATH is local video file or remote url. BEG and END is the position number.
 DESC is optional, used to describe the current timestamp link."
-  (concat "[[mpv:" path (if (or beg end) "#")
-          (if beg (number-to-string beg))
-          (if end "-")
-          (if end (number-to-string end))
-          "][▶ "
-          (if beg (mpvi-secs-to-hms beg nil t))
-          (if end " → ")
-          (if end (mpvi-secs-to-hms end nil t))
-          "]]"
-          (if desc (concat " " desc))))
+  (concat
+   (org-link-make-string
+    (concat
+     "mpv:" path (if (or beg end) "#")
+     (if beg (number-to-string beg))
+     (if end "-")
+     (if end (number-to-string end)))
+    (concat
+     "▶ "
+     (if beg (mpvi-secs-to-hms beg nil t))
+     (if end " → ")
+     (if end (mpvi-secs-to-hms end nil t))))
+   (if desc (concat " " desc))))
 
 (defcustom mpvi-attach-link-attrs "#+attr_html: :width 666"
   "Attrs insert above a inserted attach image.
@@ -435,7 +438,7 @@ The :width can make image cannot display too large in org mode."
   (when mpvi-attach-link-attrs
     (insert (string-trim mpvi-attach-link-attrs) "\n"))
   ;; insert the link
-  (insert "[[attachment:" (file-name-base file) "." (file-name-extension file) "]]")
+  (insert (org-link-make-string (concat "attachment:" (file-name-nondirectory file))))
   ;; show it
   (org-display-inline-images))
 
